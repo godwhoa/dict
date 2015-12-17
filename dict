@@ -1,0 +1,66 @@
+#!/usr/bin/python
+"""Dict
+
+Usage:
+  dict <word> [-v -n -a] [-c=<cn>]
+  dict -h | --help
+
+Options:
+  -h --help     Show this screen.
+  -v --verb     Show verb
+  -n --noun     Show noun
+  -a --adj      Show adj.
+  -c=<cn>       Count [default: 1]
+"""
+from docopt import docopt
+from bs4 import BeautifulSoup
+import requests
+
+arg = docopt(__doc__, version='Dict 0.1')
+
+# Make it default to noun
+# count to int
+def tune(arg):
+  arg["-c"] = int(arg["-c"]) 
+  if not arg['--verb'] and not arg['--adj']:
+    arg['--noun'] = True
+    return arg
+  else:
+    return arg
+arg = tune(arg)
+
+def Print(l,p):
+  count = 1
+  c = arg['-c']
+  print p
+  for i in l:
+    if count > c:
+      break
+    else:
+      print "  %d. %s" %(count,i.replace("\n", "")[1:])
+      count += 1
+
+body = requests.get('http://ninjawords.com/definitions/get/'+arg['<word>']).json()[0]['html']
+soup = BeautifulSoup(body,"lxml")
+
+noun = []
+verb = []
+adjective = []
+current = ""
+for dd in soup.find_all('dd'):
+  Class = dd["class"][0]
+  if Class == "article" and dd.text != current:
+    current = dd.text
+  if current == "noun" and Class != "article":
+    noun.append(dd.text)
+  if current == "verb" and Class!= "article":
+    verb.append(dd.text)
+  if current == "adjective" and Class != "article":
+    adjective.append(dd.text)
+
+if arg['--noun']:
+  Print(noun,"Noun")
+if arg['--verb']:
+  Print(verb,"Verb")
+if arg['--adj']:
+  Print(adjective,"Adj.")
