@@ -15,3 +15,4 @@ $ dict <word>
 #Use help for details
 $ dict -h
 ```
+#### Note: it doesn't work offline.

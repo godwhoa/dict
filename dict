@@ -18,8 +18,8 @@ import requests
 
 arg = docopt(__doc__, version='Dict 0.1')
 
-# Make it default to noun
-# count to int
+# Make it default to noun and
+# convert count to int
 def tune(arg):
   arg["-c"] = int(arg["-c"]) 
   if not arg['--verb'] and not arg['--adj']:
